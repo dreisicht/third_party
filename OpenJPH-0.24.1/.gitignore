@@ -1,9 +1,0 @@
-.DS_Store
-mytest/*
-others/*
-lib/*
-
-.vscode
-build.sh
-
-bazel-*

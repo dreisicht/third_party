@@ -123,7 +123,12 @@ BenchmarkReporter::Run CreateRunReport(
               : 0;
     }
 
-    internal::Finish(&report.counters, results.iterations, seconds,
+    // The CPU time is the total time taken by all thread. If we used that as
+    // the denominator, we'd be calculating the rate per thread here. This is
+    // why we have to divide the total cpu_time by the number of threads for
+    // global counters to get a global rate.
+    const double thread_seconds = seconds / b.threads();
+    internal::Finish(&report.counters, results.iterations, thread_seconds,
                      b.threads());
   }
   return report;
@@ -400,7 +405,7 @@ bool BenchmarkRunner::ShouldReportIterationResults(
 }
 
 double BenchmarkRunner::GetMinTimeToApply() const {
-  // In order to re-use functionality to run and measure benchmarks for running
+  // In order to reuse functionality to run and measure benchmarks for running
   // a warmup phase of the benchmark, we need a way of telling whether to apply
   // min_time or min_warmup_time. This function will figure out if we are in the
   // warmup phase and therefore need to apply min_warmup_time or if we already
